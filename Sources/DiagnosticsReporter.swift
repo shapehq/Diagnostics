@@ -40,7 +40,7 @@ public enum DiagnosticsReporter {
     }
 
     /// The title that is used in the header of the web page of the report.
-    static var reportTitle: String = "\(Bundle.appName) - Diagnostics Report"
+    static var reportTitle: String = "\(Bundle.appDisplayName) - Diagnostics Report"
 
     /// Creates the report by making use of the given reporters.
     /// - Parameters:
