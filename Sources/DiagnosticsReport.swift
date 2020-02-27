@@ -19,6 +19,9 @@ public struct DiagnosticsReport {
 
     /// The MIME type of the report. Defaults to `html`.
     public let mimeType: MimeType = .html
+    
+    /// The html representation of the diagnostics report.
+    public let html: String
 
     /// The data representation of the diagnostics report.
     public let data: Data
