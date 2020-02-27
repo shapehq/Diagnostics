@@ -77,6 +77,33 @@ public final class DiagnosticsLogger {
 
         standard.log(message: "ERROR: \(message)", file: file, function: function, line: line)
     }
+    
+    /// Logs the given screen for the diagnostics report.
+    /// - Parameters:
+    ///   - screen: The name of the screen to log.
+    ///   - file: The file from which the log is send. Defaults to `#file`.
+    ///   - function: The functino from which the log is send. Defaults to `#function`.
+    ///   - line: The line from which the log is send. Defaults to `#line`.
+    public static func log(screen: String, file: String = #file, function: String = #function, line: UInt = #line) {
+        standard.log(message: "SCREEN: \(screen)", file: file, function: function, line: line)
+    }
+    
+    /// Logs the given screen for the diagnostics report.
+    /// - Parameters:
+    ///   - event: The name of the event.
+    ///   - description: An optional description parameter to add extra info about the event.
+    ///   - file: The file from which the log is send. Defaults to `#file`.
+    ///   - function: The functino from which the log is send. Defaults to `#function`.
+    ///   - line: The line from which the log is send. Defaults to `#line`.
+    public static func log(event: String, description: String?, file: String = #file, function: String = #function, line: UInt = #line) {
+        var message = event
+
+        if let description = description {
+            message += " | \(description)"
+        }
+
+        standard.log(message: "EVENT: \(message)", file: file, function: function, line: line)
+    }
 }
 
 // MARK: - Setup & Logging
