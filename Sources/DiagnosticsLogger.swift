@@ -147,8 +147,9 @@ extension DiagnosticsLogger {
             let appVersion = "\(Bundle.appVersion) (\(Bundle.appBuildNumber))"
             let system = "\(UIDevice.current.systemName) \(UIDevice.current.systemVersion)"
             let locale = Locale.preferredLanguages[0]
+            let timezone = Calendar.current.timeZone.abbreviation() ?? ""
 
-            let message = date + "\n" + "System: \(system)\nLocale: \(locale)\nVersion: \(appVersion)\n\n"
+            let message = date + "\n" + "System: \(system)\nLocale: \(locale)\nTimezone: \(timezone)\nVersion: \(appVersion)\n\n"
 
             if self.logSize == 0 {
                 self.log(message)
