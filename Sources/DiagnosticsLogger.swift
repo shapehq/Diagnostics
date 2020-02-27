@@ -216,7 +216,9 @@ private extension DiagnosticsLogger {
 
     func setupPipe() {
         guard !isRunningTests else { return }
-
+        #if targetEnvironment(simulator)
+            // Disable capturing logs on the simulator to get logs during debugging and running tests.
+        #else
         let pipeReadHandle = inputPipe.fileHandleForReading
 
         // Copy the STDOUT file descriptor into our output pipe's file descriptor
@@ -237,6 +239,7 @@ private extension DiagnosticsLogger {
 
         // Start asynchronously monitoring our `Pipe`.
         pipeReadHandle.readInBackgroundAndNotify()
+        #endif
     }
 
     @objc func handlePipeNotification(_ notification: Notification) {
