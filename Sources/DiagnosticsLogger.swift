@@ -164,7 +164,7 @@ extension DiagnosticsLogger {
         queue.async {
             let date = self.formatter.string(from: Date())
             let file = file.split(separator: "/").last.map(String.init) ?? file
-            let output = String(format: "%@ | %@:L%@ | %@\n", date, file, String(line), message)
+            let output = String(format: "%@ | %@ | %@:%@:L%@\n", date, message, file, function, String(line))
             self.log(output)
         }
     }
