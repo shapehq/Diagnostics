@@ -4,22 +4,27 @@
 
 import PackageDescription
 
-let package = Package(name: "Diagnostics",
-                      platforms: [
-                        .macOS(.v10_15),
-                        .iOS(.v10),
-                        .tvOS(.v12),
-                        .watchOS(.v6)],
-                      products: [
-                        // dev .library(name: "DangerDeps", type: .dynamic, targets: ["DangerDependencies"]),
-                        .library(name: "Diagnostics", targets: ["Diagnostics"])
-                        ],
-                      dependencies: [
-                        // dev .package(url: "https://github.com/danger/swift", from: "3.0.0"),
-                        // dev .package(path: "Submodules/WeTransfer-iOS-CI/Danger-Swift")
-                        ],
-                      targets: [
-                        // dev .target(name: "DangerDependencies", dependencies: ["Danger", "WeTransferPRLinter"], path: "Submodules/WeTransfer-iOS-CI/Danger-Swift", sources: ["DangerFakeSource.swift"]),
-                        .target(name: "Diagnostics", path: "Sources")
-                        ],
-                      swiftLanguageVersions: [.v5])
+let package = Package(
+    name: "Diagnostics",
+    platforms: [
+        .macOS(.v10_15),
+        .iOS(.v10),
+        .tvOS(.v12),
+        .watchOS(.v6)
+    ],
+    products: [
+        .library(
+            name: "Diagnostics",
+            type: .dynamic,
+            targets: ["Diagnostics"]),
+    ],
+    dependencies: [],
+    targets: [
+        .target(
+            name: "Diagnostics",
+            dependencies: [],
+            path: "Sources"
+        )
+    ],
+    swiftLanguageVersions: [.v5]
+)
