@@ -15,7 +15,7 @@ public final class DiagnosticsLogger {
 
     static let standard = DiagnosticsLogger()
 
-    private lazy var location: URL = FileManager.default.documentsDirectory.appendingPathComponent("diagnostics_log.txt")
+    private var location: URL!
     private let inputPipe: Pipe = Pipe()
     private let outputPipe: Pipe = Pipe()
     private let queue: DispatchQueue = DispatchQueue(label: "com.wetransfer.diagnostics.logger", qos: .utility, target: .global(qos: .utility))
@@ -47,8 +47,8 @@ public final class DiagnosticsLogger {
 
     /// Sets up the logger to be ready for usage. This needs to be called before any log messages are reported.
     /// This method also starts a new session.
-    public static func setup() throws {
-        try standard.setup()
+    public static func setup(fileLocation: URL) throws {
+        try standard.setup(fileLocation: fileLocation)
     }
 
     /// Logs the given message for the diagnostics report.
@@ -124,7 +124,8 @@ extension DiagnosticsLogger {
         try? FileManager.default.removeItem(atPath: location.path)
     }
 
-    private func setup() throws {
+    private func setup(fileLocation: URL) throws {
+        self.location = fileLocation
         if !FileManager.default.fileExists(atPath: location.path) {
             try FileManager.default.createDirectory(atPath: FileManager.default.documentsDirectory.path, withIntermediateDirectories: true, attributes: nil)
             guard FileManager.default.createFile(atPath: location.path, contents: nil, attributes: nil) else {
