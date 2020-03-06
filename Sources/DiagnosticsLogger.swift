@@ -39,6 +39,12 @@ public final class DiagnosticsLogger {
 
     /// Whether the logger is setup and ready to use.
     private var isSetup: Bool = false
+    
+    /// Count times a log has been created in runtime
+    private var fileCreationCount = 0
+
+    /// Limit for creating log files
+    private var fileCreationLimit = 2
 
     /// Whether the logger is setup and ready to use.
     public static func isSetUp() -> Bool {
@@ -125,21 +131,35 @@ extension DiagnosticsLogger {
     }
 
     private func setup(fileLocation: URL) throws {
+        guard !isSetup else { fatalError() }
         self.location = fileLocation
-        if !FileManager.default.fileExists(atPath: location.path) {
-            try FileManager.default.createDirectory(atPath: FileManager.default.documentsDirectory.path, withIntermediateDirectories: true, attributes: nil)
-            guard FileManager.default.createFile(atPath: location.path, contents: nil, attributes: nil) else {
-                assertionFailure("Unable to create the log file")
-                return
-            }
-        }
-
+        
+        createFileIfNeccessary()
+        
         let fileHandle = try FileHandle(forReadingFrom: location)
         fileHandle.seekToEndOfFile()
         logSize = Int64(fileHandle.offsetInFile)
+        fileHandle.closeFile()
         setupPipe()
         isSetup = true
         startNewSession()
+    }
+    
+    /**
+     Creates the log file if it doesn't exist
+     **/
+    private func createFileIfNeccessary() {
+        if fileCreationCount > fileCreationLimit {
+            return assertionFailure()
+        }
+
+        if !FileManager.default.fileExists(atPath: location.path) {
+            let success = FileManager.default.createFile(atPath: location.path, contents: nil, attributes: nil)
+            if !success {
+                assertionFailure("Unable to create the log file")
+            }
+            fileCreationCount += 1
+        }
     }
 
     internal func startNewSession() {
@@ -172,17 +192,24 @@ extension DiagnosticsLogger {
     }
 
     private func log(_ output: String) {
-        guard
-            let data = output.data(using: .utf8),
-            let fileHandle = (try? FileHandle(forWritingTo: location)) else {
-                return assertionFailure()
-        }
-
         // Make sure we have enough disk space left. This prevents a crash due to a lack of space.
         guard UIDevice.current.freeDiskSpaceInBytes > minimumRequiredDiskSpace else { return }
+        guard let data = output.data(using: .utf8) else { return assertionFailure() }
+        
+        let fileHandle: FileHandle
+        do {
+            fileHandle = try FileHandle(forWritingTo: location)
+        } catch {
+            // Handles created a new log file if the existing has disappeared during runtime.
+            // This occurs in debug when creating the file in an app groups folder within the first 1 second of run time.
+            createFileIfNeccessary()
+            log(output)
+            return
+        }
 
         fileHandle.seekToEndOfFile()
         fileHandle.write(data)
+        fileHandle.closeFile()
         logSize += Int64(data.count)
         trimLinesIfNecessary()
     }
@@ -262,22 +289,6 @@ private extension DiagnosticsLogger {
             string.enumerateLines(invoking: { (line, _) in
                 self.log("SYSTEM: \(line)\n")
             })
-        }
-    }
-}
-
-private extension FileManager {
-    var documentsDirectory: URL {
-        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        return paths[0]
-    }
-
-    func fileExistsAndIsFile(atPath path: String) -> Bool {
-        var isDirectory: ObjCBool = false
-        if fileExists(atPath: path, isDirectory: &isDirectory) {
-            return !isDirectory.boolValue
-        } else {
-            return false
         }
     }
 }
