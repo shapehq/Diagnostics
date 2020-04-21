@@ -91,7 +91,7 @@ public final class DiagnosticsLogger {
     ///   - function: The functino from which the log is send. Defaults to `#function`.
     ///   - line: The line from which the log is send. Defaults to `#line`.
     public static func log(screen: String, file: String = #file, function: String = #function, line: UInt = #line) {
-        standard.log(message: "SCREEN: \(screen)", file: file, function: function, line: line)
+        standard.log(message: "SCREEN: \(screen)", file: file, function: function, line: line, suppressCallerInfo: true)
     }
     
     /// Logs the given screen for the diagnostics report.
@@ -108,7 +108,7 @@ public final class DiagnosticsLogger {
             message += " | \(description)"
         }
 
-        standard.log(message: "EVENT: \(message)", file: file, function: function, line: line)
+        standard.log(message: "EVENT: \(message)", file: file, function: function, line: line, suppressCallerInfo: true)
     }
 }
 
@@ -180,13 +180,18 @@ extension DiagnosticsLogger {
         }
     }
 
-    private func log(message: String, file: String = #file, function: String = #function, line: UInt = #line) {
+    private func log(message: String, file: String = #file, function: String = #function, line: UInt = #line, suppressCallerInfo: Bool = false) {
         guard isSetup else { return assertionFailure() }
 
         queue.async {
             let date = self.formatter.string(from: Date())
             let file = file.split(separator: "/").last.map(String.init) ?? file
-            let output = String(format: "%@ | %@ | %@:%@:L%@\n", date, message, file, function, String(line))
+            let output: String
+            if suppressCallerInfo {
+                output = String(format: "%@ | %@\n", date, message)
+            } else {
+                output = String(format: "%@ | %@ | %@:%@:L%@\n", date, message, file, function, String(line))
+            }
             self.log(output)
         }
     }
