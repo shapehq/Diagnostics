@@ -9,14 +9,20 @@
 import Foundation
 
 /// Generates a report from all the registered UserDefault keys.
-public final class UserDefaultsReporter: DiagnosticsReporting {
+open class UserDefaultsReporter: DiagnosticsReporting {
+    
+    open class var title: String {
+        return "UserDefaults"
+    }
 
     /// Defaults to `standard`. Can be used to override and return a different user defaults.
-    public static var userDefaults: UserDefaults = .standard
+    open class var userDefaults: UserDefaults {
+        return .standard
+    }
 
     public static func report() -> DiagnosticsChapter {
         let userDefaults = self.userDefaults.dictionaryRepresentation()
-        return DiagnosticsChapter(title: "UserDefaults", diagnostics: userDefaults, formatter: self)
+        return DiagnosticsChapter(title: title, diagnostics: userDefaults, formatter: self)
     }
 }
 
