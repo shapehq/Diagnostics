@@ -32,8 +32,8 @@ public final class DiagnosticsLogger {
     private lazy var formatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        formatter.locale = Locale(identifier: "en_US")
-        formatter.timeZone = TimeZone(identifier: "GMT")!
+        formatter.locale = Locale(identifier: "da_DK")
+        formatter.timeZone = TimeZone.current
         return formatter
     }()
 
